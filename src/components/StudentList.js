@@ -1,44 +1,44 @@
 import React, { Component } from 'react';
-import TutorialDataService from '../services/tutorial.service';
+import StudentDataService from '../services/Student.service';
 import { Link } from 'react-router-dom';
 
-export default class TutorialsList extends Component {
+export default class StudentsList extends Component {
   constructor(props) { //ทำทันที
     super(props);//ส่งให้ตัวแม่
 
-    this.onChangeSearchTitle=this.onChangeSearchTitle.bind(this);
-    this.retrieveTutorials=this.retrieveTutorials.bind(this);
+    this.onChangeSearchName=this.onChangeSearchName.bind(this);
+    this.retrieveStudents=this.retrieveStudents.bind(this);
     this.refreshList=this.refreshList.bind(this);
-    this.setActiveTutorial=this.setActiveTutorial.bind(this);
-    this.removeAllTutorials=this.removeAllTutorials.bind(this);
-    this.searchTitle=this.searchTitle.bind(this);
+    this.setActiveStudent=this.setActiveStudent.bind(this);
+    this.removeAllStudents=this.removeAllStudents.bind(this);
+    this.searchName=this.searchName.bind(this);
 
     
 
     this.state = {
-      tutorials: [], 
-      currentTutotrial: null,
+      students: [], 
+      currentStudent: null,
       currentIndex: -1,
-      searchTitle: ""
+      searchStudent: ""
     };
   }
 
   componentDidMount() { //ถูกเรียก หรือ เริ่มต้น จะทำงานทันที โดยที่เราไม่ต้องเรียก
-    this.retrieveTutorials();
+    this.retrieveStudents();
   }
 
-  onChangeSearchTitle(e){
-    const searchTitle = e.target.value
+  onChangeSearchName(e){
+    const searchName = e.target.value
     this.setState({
-      searchTitle : searchTitle
+      searchName : searchName
     })
   }
 
-  retrieveTutorials(){ //ดึงออกมาทั้งหมดเพื่อแสดงรายการออกมา
-    TutorialDataService.getAll()
+  retrieveStudents(){ //ดึงออกมาทั้งหมดเพื่อแสดงรายการออกมา
+    StudentDataService.getAll()
       .then(response => {
         this.setState({
-          tutorials: response.data
+          students: response.data
       });
       })
       .catch(err => {
@@ -47,22 +47,22 @@ export default class TutorialsList extends Component {
   }
 
   refreshList(){ //เอาไว้รีเฟรชข้อมูล และเซ็ตค่าข้อมูลใหม่ หรืออัพเดท
-    this.retrieveTutorials();
+    this.retrieveStudents();
     this.setState({
-      currentTutotrial: null,
+      currentStudent: null,
       currentIndex: -1
     });
   }
 
-  setActiveTutorial(tutorial, index){
+  setActiveStudent(student, index){
     this.setState({
-      currentTutotrial: tutorial,
+      currentStudent: student,
       currentIndex: index
     });
   }
 
-  removeAllTutorials(){
-    TutorialDataService.deleteAll()
+  removeAllStudents(){
+    StudentDataService.deleteAll()
     .then(response => {
       this.refreshList();
       
@@ -72,11 +72,11 @@ export default class TutorialsList extends Component {
     })
   }
 
-  searchTitle(){ //ค้นหาข้อมูล
-    TutorialDataService.findByTitle(this.state.searchTitle)
+  searchName(){ //ค้นหาข้อมูล
+    StudentDataService.findByName(this.state.searchName)
       .then(response => {
         this.setState({
-          tutorial: response.data
+          student: response.data
         })
       })
       .catch(err => {
@@ -85,7 +85,7 @@ export default class TutorialsList extends Component {
   }
 
   render() {
-    const {searchTitle, tutorials, currentTutotrial, currentIndex} = this.state;
+    const {searchName, students, currentStudent, currentIndex} = this.state;
 
     return (
       <div className='list row'>
@@ -94,69 +94,76 @@ export default class TutorialsList extends Component {
             <input 
               type='text'
               className='form-control'
-              placeholder='Search by title'
-              value={searchTitle}
-              onChange={this.onChangeSearchTitle}
+              placeholder='Search Name'
+              value={searchName}
+              onChange={this.onChangeSearchName}
               />
             <div className='input-group-append'>
               <button
                 className='btn btn-outline-secondary'
                 type='button'
-                onClick={this.searchTitle}
+                onClick={this.searchName}
               >
                 Search</button>
               </div>  
           </div>
         </div>
         <div className='col-md-6'>
-          <h4>Tutorials List</h4>
+          <h4>Student List</h4>
 
           <ul className='list-group'>
-              {tutorials && tutorials.map((tutorial,index) => (
+              {students && students.map((student,index) => (
               <li className={"list-group-item "+ (index === currentIndex ? "active" : "")}
-                onClick={() => this.setActiveTutorial(tutorial, index)}
+                onClick={() => this.setActiveStudent(student, index)}
                 key={index}>
-                {tutorial.title}</li>
+                {student.Name}{" "}{student.Surname}</li>
             ))}         
           </ul>
 
           <button 
             className='btn btn-sm btn-danger m-3' 
-            onClick={this.removeAllTutorials}
+            onClick={this.removeAllStudents}
             >
-              RemoveAll
+            RemoveAll
           </button>
         </div>
         <div className='col-md-6'>
-                {currentTutotrial ? (
+                {currentStudent ? (
                 <div>
-                  <h4>Tutorial Detail</h4>
+                  <h4>Student Detail</h4>
                   <div>
                     <label>
-                      <strong>Title :</strong>
+                      <strong>Name :</strong>
                     </label>
                     {" "}
-                    {currentTutotrial.title}
+                    {currentStudent.Name}
                   </div>
                   <div>
                     <label>
-                      <strong>Description :</strong>
+                      <strong>Surname :</strong>
                     </label>
                     {" "}
-                    {currentTutotrial.description}
+                    {currentStudent.Surname}
+                  </div>
+                  <div>
+                    <label>
+                      <strong>University :</strong>
+                    </label>
+                    {" "}
+                    {currentStudent.University}
                   </div>
                   <div>
                     <label>
                       <strong>Status : </strong>
                     </label>
                     {" "}
-                    {currentTutotrial.published ? "Published" : "Pending"}
+                    {currentStudent.Graduate ? "Graduate" : "Didn't graduate"}
                   </div>
                 </div>
                 ) : (
                 <div>
                   <br/>
-                  <p>Please Click on a Tutorial...</p>
+                  <p>Please Click on a Name...</p>
                 </div>
                 )}
         </div>
